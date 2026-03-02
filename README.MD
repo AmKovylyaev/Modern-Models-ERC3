@@ -1,75 +1,69 @@
-# ERC3 Sample Agents
+# ERC3: LLM-агент для автоматизации корпоративных API
 
-Sample agents demonstrating how to participate in the ERC3: AI Agents in Action competition.
+Проект курса «Современные модели» (НИУ ВШЭ). Разработка LLM-агента, который принимает пользовательские запросы на естественном языке и автономно выполняет их через набор корпоративных API — управление проектами, сотрудниками, клиентами, таблицами рабочего времени и внутренней Wiki.
 
-## Getting Started
+Решение построено на подходе [Schema-Guided Reasoning](https://abdullin.com/schema-guided-reasoning/) и проверяется на бенчмарках соревнования [ERC3: AI Agents in Action](https://www.timetoact-group.at/events/enterprise-rag-challenge-part-3).
 
-### 1. Get Your API Key
+## Как это работает
 
-To use these agents, you'll need an ERC3 API key:
+Агент получает задачу на естественном языке и итеративно решает её:
 
-1. Visit https://erc.timetoact-group.at/
-2. Enter the email address you used during registration
-3. Your API key will be displayed
+1. Извлекает правила безопасности из Wiki компании
+2. Проводит проверку запроса на очевидные нарушения доступа
+3. Запускает цикл ReAct: LLM через Structured Output выбирает следующий API-вызов, получает результат, планирует дальше — до завершения задачи
 
-Note: If you haven't registered yet, https://www.timetoact-group.at/events/enterprise-rag-challenge-part-3 and allow 24 hours for your
-registration to be processed.
+## Данные
 
-### 2. Prerequisites
+Все данные находятся на платформе ERC3 и представляют собой симулированные корпоративные среды. Агент работает с ними исключительно через API, без локальных датасетов.
 
-All agents require:
-- ERC3 SDK - for connecting to the platform and accessing benchmarks
-- ERC3_API_KEY - your competition API key
-- LLM API Key - such as OPENAI_API_KEY or equivalent (depending on the agent)
 
-## Running an Agent
+| Сущность   | Описание                                             | Доступ                            |
+| ---------- | ---------------------------------------------------- | --------------------------------- |
+| Проекты    | Название, статус, команда, клиент                    | API: поиск, фильтрация по команде |
+| Сотрудники | Имя, должность, отдел, зарплата, навыки              | API: поиск                        |
+| Клиенты    | Название компании, аккаунт-менеджеры                 | API: чтение, поиск                |
+| Таблицы    | Записи рабочего времени по сотрудникам и проектам    | API: чтение, обновление, удаление |
+| Wiki       | Страницы внутренней базы знаний с правилами компании | API: чтение, обновление, удаление |
 
-Here's an example of running the sgr-agent-store (a simple agent that solves the store benchmark):
 
-```
-# Set up your environment variables
+Бенчмарки (от простого к сложному):
+
+- **store** — интернет-магазин (корзина, купоны, чекаут)
+- **erc3-dev** — базовый корпоративный сценарий
+- **erc3-test** — усложнённый, с тонкими изменениями в компаниях
+- **erc3-prod** — финальный бенчмарк соревнования
+
+## Структура репозитория
+
+
+| Директория             | Описание                          |
+| ---------------------- | --------------------------------- |
+| `sgr-agent-store/`     | Простой агент для store-бенчмарка |
+| `sgr-agent-erc3/`      | Базовый SGR-агент для erc3-dev    |
+| `sgr-agent-erc3-test/` | Улучшенный агент для erc3-test    |
+| `sgr-agent-erc3-prod/` | Продакшн-агент для erc3-prod      |
+| `design_doc.md`        | Проектный документ (Design Doc)   |
+
+
+## Быстрый старт
+
+```bash
 export OPENAI_API_KEY=sk-...
 export ERC3_API_KEY=key-...
 
-# Navigate to the agent directory
-cd sgr-agent-store
-
-# Activate your virtual environment (optional but recommended)
-# python3 -m venv venv
-# source venv/bin/activate  # On Windows: venv\Scripts\activate
-
-# Install dependencies
+cd sgr-agent-erc3-prod
 pip install -r requirements.txt
-
-# Run the agent
 python3 main.py
 ```
 
-this should look like this:
+API-ключ ERC3 можно получить на [платформе](https://erc.timetoact-group.at/).
 
-![res/console.png](res/console.png)
-
-you can also go to the [Web UI]() and view your running session there:
-
-![res/session.png](res/session.png)
-
-Task execution view allows to see interactions of agent with the Benchmark in more detail:
-
-![res/log.png](res/log.png)
+## Команда
 
 
+| Участник                      | Роль        |
+| ----------------------------- | ----------- |
+| Ковыляев Александр Максимович | Разработчик |
+| Жуков Даниил Олегович         | Разработчик |
 
-# Available Agents
-
-- sgr-agent-store - A simple agent implementation for [STORE benchmark](https://erc.timetoact-group.at/benchmarks/store). It relies on [Schema-Guided Reasoning](https://abdullin.com/schema-guided-reasoning/) to provide adaptive thinking capabilities with a single recursive prompt and gpt-4o.
-- sgr-agent-erc3 - A simple [SGR](https://abdullin.com/schema-guided-reasoning/) NextStep agent for [ERC3-DEV benchmark](https://erc.timetoact-group.at/benchmarks/erc3-dev).
-
-# Resources
-
-- https://www.timetoact-group.at/events/enterprise-rag-challenge-part-3
-- https://erc.timetoact-group.at/
-
-# Support
-
-You can ask questions in the discord channel (you get a link to that with the registration email)
 
